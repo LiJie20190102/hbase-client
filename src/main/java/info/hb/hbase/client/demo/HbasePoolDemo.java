@@ -14,7 +14,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import zx.soft.common.conn.pool.PoolConfig;
+import info.hb.hbase.client.pool.PoolConfig;
 
 /**
  * HBase连接池示例：包含Table数据写入、批量异步写入、数据扫描

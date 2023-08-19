@@ -1,4 +1,4 @@
-package zx.soft.common.conn.pool;
+package info.hb.hbase.client.exception;
 
 /**
  * 连接异常

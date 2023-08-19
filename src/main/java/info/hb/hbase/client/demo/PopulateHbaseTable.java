@@ -16,9 +16,11 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.RegionLocator;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
@@ -76,7 +78,7 @@ public class PopulateHbaseTable {
 		Table table = connection.getTable(TableName.valueOf(tableName));
 
 		// 自动配置分区和Reducer
-		HFileOutputFormat2.configureIncrementalLoadMap(job, table);
+		HFileOutputFormat2.configureIncrementalLoadMap(job, table.getDescriptor());
 
 		// 定义Mapper和Reducer
 		job.setMapperClass(CustomMapper.class);
@@ -97,7 +99,9 @@ public class PopulateHbaseTable {
 
 		// 将HFileOutputFormat2格式的输出加载到数据表中
 		LoadIncrementalHFiles load = new LoadIncrementalHFiles(config);
-		load.doBulkLoad(new Path(outputPath), (HTable) table);
+		Admin admin = connection.getAdmin();
+		RegionLocator regionLocator = table.getRegionLocator();
+		load.doBulkLoad(new Path(outputPath), admin,(HTable) table,regionLocator);
 	}
 
 	private static void changePermissionR(String output, FileSystem hdfs)

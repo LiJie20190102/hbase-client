@@ -1,25 +1,30 @@
 package info.hb.hbase.client.demo;
 
 import info.hb.hbase.client.core.HbasePool;
+import info.hb.hbase.client.exception.OperateHbaseException;
 import info.hb.hbase.client.utils.Cdh5Config;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.CoprocessorDescriptor;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
 import org.apache.hadoop.hbase.client.coprocessor.LongColumnInterpreter;
+import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import zx.soft.common.conn.pool.PoolConfig;
+import info.hb.hbase.client.pool.PoolConfig;
 
 /**
  * HBase统计数据表行数示例
@@ -95,14 +100,21 @@ public class RowCounterDemo {
 
 	private static void addTableCoprocessor(Admin admin, TableName tableName) {
 		try {
-			admin.disableTable(tableName);
+			String aggregateImplementation = "org.apache.hadoop.hbase.coprocessor.AggregateImplementation";
 			HTableDescriptor htd = admin.getTableDescriptor(tableName);
+			List<String> coprocessors = htd.getCoprocessorDescriptors().stream().map(CoprocessorDescriptor::getClassName).collect(Collectors.toList());
+			if (coprocessors.contains(aggregateImplementation)) {
+				return;
+			}
+			admin.disableTable(tableName);
+			HTableDescriptor hTableDescriptor = HTableDescriptor.parseFrom(htd.toByteArray());
+
 			// 协处理器可以选择
-			htd.addCoprocessor("org.apache.hadoop.hbase.coprocessor.AggregateImplementation");
-			admin.modifyTable(tableName, htd);
+			hTableDescriptor.addCoprocessor(aggregateImplementation);
+			admin.modifyTable(tableName, hTableDescriptor);
 			admin.enableTable(tableName);
-		} catch (IOException e) {
-			throw new RuntimeException();
+		} catch (IOException | DeserializationException e) {
+			throw new OperateHbaseException(e.getMessage(),e);
 		}
 	}
 

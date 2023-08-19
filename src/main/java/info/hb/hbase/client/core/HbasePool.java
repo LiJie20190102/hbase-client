@@ -3,9 +3,9 @@ package info.hb.hbase.client.core;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Connection;
 
-import zx.soft.common.conn.pool.ConnectionPool;
-import zx.soft.common.conn.pool.PoolBase;
-import zx.soft.common.conn.pool.PoolConfig;
+import info.hb.hbase.client.pool.ConnectionPool;
+import info.hb.hbase.client.pool.PoolBase;
+import info.hb.hbase.client.pool.PoolConfig;
 
 /**
  * Hbase连接池

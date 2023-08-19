@@ -17,7 +17,7 @@ import org.apache.hadoop.hbase.regionserver.BloomType;
 import org.apache.hadoop.hbase.regionserver.ConstantSizeRegionSplitPolicy;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import zx.soft.common.conn.pool.PoolConfig;
+import info.hb.hbase.client.pool.PoolConfig;
 
 public class HbaseAdminDemo {
 

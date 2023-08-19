@@ -1,4 +1,4 @@
-package zx.soft.common.conn.pool;
+package info.hb.hbase.client.pool;
 
 import java.io.Serializable;
 

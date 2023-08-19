@@ -63,7 +63,7 @@ public class HbaseBulkImportDemo {
 		Table table = connection.getTable(TableName.valueOf("myLittleHBaseTable"));
 
 		// Auto configure partitioner and reducer
-		HFileOutputFormat2.configureIncrementalLoadMap(job, table);
+		HFileOutputFormat2.configureIncrementalLoadMap(job, table.getDescriptor());
 
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
